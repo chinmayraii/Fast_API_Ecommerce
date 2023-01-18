@@ -3,10 +3,17 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter,Depends,UploadFile,File
 from admin.apis.pydantic_models import categoryitem
 import os
-from s
+from slugify import slugify
 from datetime import datetime,timedelta
+from configs import appinfo
+from functools import lru_cache
 
+# @lru_cache()
+# def app_setting():
+#     return appinfo.Setting()
 
+# settings=app_setting()
+# app_url=settings.app_url    
 
 
 router=APIRouter()
@@ -40,10 +47,10 @@ async def create_category(data: categoryitem=Depends(),category_image:UploadFile
         with open(generated_name,"wb") as file:
             file.write(file_content) 
             file.close()
-        image_url=app_url+generated_name
+        # image_url=app_url+generated_name
 
         category_obj=await Category.create(
-            category_image=image_url,
+            category_image=generated_name,
             description=data.description,
             name=data.name,
             slug=slug
@@ -52,4 +59,10 @@ async def create_category(data: categoryitem=Depends(),category_image:UploadFile
         if category_obj:
             return {"status":True,"message":" category added"}
         else:
-            return {"status":False,"message":" something wrong"}                  
+            return {"status":False,"message":" something wrong"}       
+                       
+
+@router.get('/categoryall/')
+async def get_category():
+    category_obj = await Category.all()
+    return category_obj
