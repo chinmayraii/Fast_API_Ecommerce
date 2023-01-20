@@ -4,7 +4,7 @@ from fastapi import APIRouter,Depends,UploadFile,File
 from admin.apis.pydantic_models import categoryitem
 import os
 from slugify import slugify
-from datetime import datetime,timedelta
+from datetime import datetime
 from configs import appinfo
 from functools import lru_cache
 
