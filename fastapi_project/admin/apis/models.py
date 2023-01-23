@@ -31,6 +31,8 @@ class Product(Model):
     selling_price= fields.IntField()
     discount_price=fields.IntField()
     description=fields.CharField(300)
+    category=fields.ForeignKeyField('models.Category',related_name='category',on_delete='CASCADE')
+    SubCategory=fields.ForeignKeyField('models.SubCategory',related_name='subcategory',on_delete='CASCADE')
     is_active= fields.BooleanField(defualt=True,null=True)
     updated_at= fields.DatetimeField(auto_now=True)
     create_at = fields.DatetimeField(auto_now_add=True)

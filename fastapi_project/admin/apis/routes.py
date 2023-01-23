@@ -117,52 +117,60 @@ async def create_subcategory(data: subcategoryitem = Depends(), subcategory_imag
 
 @router.post('/product/')
 async def create_product(data: productitem=Depends(),product_image:UploadFile=File(...)):
-    if await Product.exists(id=data.subcategory_id):
-        product_obj = await Category.get(id=data.subcategory_id)
+    if await Category.exists(id=data.category_id):
+            category_obj = await Category.get(id=data.category_id)
 
-        if await Product.exists(name=data.product_name):
-            return{"status":False,"message":"Product already exists"}
-        else:
-            slug=slugify(data.product_name)
+            if await SubCategory.exists(id=data.subcategory_id):
+                subcat_obj = await SubCategory.get(id=data.subcategory_id)
+                    
 
-            FILEPATH='static/images/product'
+                if await Product.exists(product_name=data.product_name):
+                    return{"status":False,"message":"Product already exists"}
+                else:
+                    slug=slugify(data.product_name)
 
-            if not os.path.isdir(FILEPATH):
-                os.mkdir(FILEPATH)
+                    FILEPATH='static/images/product'
 
-            filename=product_image.filename
-            extention=filename.split(".")[1]
-            imagename=filename.split(".")[0] 
+                    if not os.path.isdir(FILEPATH):
+                        os.mkdir(FILEPATH)
 
-            if extention not in ['png','jpg','jpeg']:
-                return {'status':'error',"details":'file extension not allowed'}
+                    filename=product_image.filename
+                    extention=filename.split(".")[1]
+                    imagename=filename.split(".")[0] 
 
-            dt=datetime.now()
-            dt_timestamp=round(datetime.timestamp(dt))
+                    if extention not in ['png','jpg','jpeg']:
+                        return {'status':'error',"details":'file extension not allowed'}
 
-            modified_image_name=imagename+" "+str(dt_timestamp)+" "+extention
-            generated_name=FILEPATH+modified_image_name
-            file_content=await product_image.read()
+                    dt=datetime.now()
+                    dt_timestamp=round(datetime.timestamp(dt))
 
-            with open(generated_name,"wb") as file:
-                file.write(file_content) 
-                file.close()
-            # image_url=app_url+generated_name
+                    modified_image_name=imagename+"_"+str(dt_timestamp)+"."+extention
+                    generated_name=FILEPATH+modified_image_name
+                    file_content=await product_image.read()
 
-            product_obj=await Product.create(
-                category_image=generated_name,
-                product_name=data.product_name,
-                brand=data.brand,
-                selling_price=data.selling_price,
-                discount_price=data.discount_price,
-                description=data.description,
-                slug=slug,
-            )
+                    with open(generated_name,"wb") as file:
+                        file.write(file_content) 
+                        file.close()
+                    # image_url=app_url+generated_name
 
-            if product_obj:
-                return {"status":True,"message":" product added"}
-            else:
-                return {"status":False,"message":" something wrong"}       
+                    product_obj=await Product.create(
+                        category_image=generated_name,
+                        product_name=data.product_name,
+                        brand=data.brand,
+                        selling_price=data.selling_price,
+                        discount_price=data.discount_price,
+                        description=data.description,
+                        category=category_obj,
+                        SubCategory=subcat_obj,
+                        slug=slug,
+                    )
+
+                    if product_obj:
+                        return {"status":True,"message":" product added"}
+                    else:
+                        return {"status":False,"message":" something wrong"} 
+            
+                        
                         
 
 

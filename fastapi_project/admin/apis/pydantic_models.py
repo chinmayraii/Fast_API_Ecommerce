@@ -13,6 +13,7 @@ class subcategoryitem(BaseModel):
     description:str    
 
 class productitem(BaseModel):
+    category_id:int
     subcategory_id:int
     product_name:str
     brand:str
